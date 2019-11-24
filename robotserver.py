@@ -4,10 +4,12 @@ from gpiozero import Servo
 
 host = '169.254.159.7'
 port = 1234
+motor1 = Servo(0,initial_value = -1)
+
 
 def readInput(data):
-        x_axis = data[0]
-        return x_axis
+	x_axis = data[0]
+	return x_axis
 
 
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -19,11 +21,10 @@ conn, addr=s.accept()
 print("Conn: ",conn," Address: ",addr)
 
 x_axis = -1
-y_axis = -1
 
 while True:
-        data = pickle.loads(conn.recv(1024))
-        d = readInput(data)
-        send = ("Recieved: " + str(d))
-        print(send)
-
+	data = pickle.loads(conn.recv(1024))
+	d = readInput(data)
+	motor1.value = d
+	send = ("Recieved: " + str(d))
+	print(send)
