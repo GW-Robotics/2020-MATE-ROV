@@ -4,8 +4,9 @@ from gpiozero import Servo
 
 host = '169.254.159.7'
 port = 1234
-motor1 = Servo(0,initial_value = -1)
+motor0 = Servo(0,initial_value = -1)
 
+motor1 = Servo(1,initial_value = -1)
 
 def readInput(data):
 	x_axis = data[0]
@@ -25,6 +26,7 @@ x_axis = -1
 while True:
 	data = pickle.loads(conn.recv(1024))
 	d = readInput(data)
+	motor0.value = d
 	motor1.value = d
 	send = ("Recieved: " + str(d))
 	print(send)
