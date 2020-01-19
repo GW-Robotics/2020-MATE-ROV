@@ -2,11 +2,11 @@ import socket, pickle
 import time
 #from gpiozero import Servo
 
-host = '127.0.0.1'
-#host = '169.254.159.7'
+#host = '127.0.0.1'
+host = '169.254.159.7'
 port = 1234
 
-#motor1 = Servo(1,initial_value = -1)
+motor1 = Servo(1,initial_value = -1)
 #motor2 = Servo(2,initial_value = -1)
 #motor3 = Servo(3,initial_value = -1)
 #motor4 = Servo(4,initial_value = -1)
@@ -15,8 +15,8 @@ port = 1234
 #motor7 = Servo(7,initial_value = -1)
 #motor8 = Servo(8,initial_value = -1)
 
-motor0 = Servo(0,initial_value = None)
-motor1 = Servo(1,initial_value = None)
+#motor0 = Servo(0,initial_value = None)
+#motor1 = Servo(1,initial_value = None)
 
 def readInput(data):
 	x_axis = data[0]
@@ -113,18 +113,11 @@ while True:
 	#print(send)
 
 x_axis = -1
-init = false
 while True:
 	data = pickle.loads(conn.recv(1024))
 	d = readInput(data)
-	if d is not 0
-		if not init:
-			motor0.value = -1
-			motor1.value = -1
-		else:
-			motor0.value = d
-			motor1.value = d
-	
+	motor0.value = d
+	motor1.value = d
 	send = ("Recieved: " + str(d))
 	print(send)
 
