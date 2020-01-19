@@ -112,12 +112,18 @@ while True:
 	#send = ("Recieved: " + str(d))
 	#print(send)
 
-x_axis = -1
+init = false
 while True:
 	data = pickle.loads(conn.recv(1024))
 	d = readInput(data)
-	motor0.value = d
-	motor1.value = d
+	if not d == 0:
+		if not init:
+			motor0.value = -1
+			motor1.value = -1
+		else:
+			motor0.value = d
+			motor1.value = d
+	
 	send = ("Recieved: " + str(d))
 	print(send)
 
