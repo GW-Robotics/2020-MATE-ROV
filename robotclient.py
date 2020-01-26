@@ -3,8 +3,8 @@ import sys
 import pygame
 import os
 
-host = "127.0.0.1"
-#host = '169.254.159.7'
+# host = "127.0.0.1"
+host = '192.168.137.92'
 port = 1234	
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -67,10 +67,11 @@ while not done:
 	bt5 = joystick.get_button(5)
 
 	d = [ax0,ax1,ax2,ax3,ax4,bt4,bt5,1]
-	for i in d:
-		i = round(i,2)
+	d = [round(i*100) + 100 for i in d]
 
-	data = pickle.dumps(d)
-	s.send(data)
+	s.recv(1)
+
+	# data = pickle.dumps(d)
+	s.sendall(bytearray(d))
 
 

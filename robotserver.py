@@ -1,6 +1,6 @@
 import socket, pickle
 import time
-#from gpiozero import Servo
+from gpiozero import Servo
 
 #host = '127.0.0.1'
 host = '169.254.159.7'
@@ -15,12 +15,6 @@ motor1 = Servo(1,initial_value = -1)
 #motor7 = Servo(7,initial_value = -1)
 #motor8 = Servo(8,initial_value = -1)
 
-#motor0 = Servo(0,initial_value = None)
-#motor1 = Servo(1,initial_value = None)
-
-def readInput(data):
-	x_axis = data[0]
-	return x_axis
 
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.bind((host,port))
@@ -54,7 +48,7 @@ ax4 = 4
 bt4 = 5
 bt5 = 6
 
-#motors = [motor1,motor2,motor3,motor4,motor5,motor6,motor7,motor8]
+motors = [motor1,motor2,motor3,motor4,motor5,motor6,motor7,motor8]
 
 motorInputs = [
 	{	
@@ -107,22 +101,7 @@ while True:
 		if (activeInputs != 0):
 			motorSum = motorSum / activeInputs
 			print("Motor " + str(i+1) + ": " + str(motorSum*180))
-		#motors[i].value = motorSum * 180	
-	
-	#send = ("Recieved: " + str(d))
-	#print(send)
-
-init = false
-while True:
-	data = pickle.loads(conn.recv(1024))
-	d = readInput(data)
-	if not d == 0:
-		if not init:
-			motor0.value = -1
-			motor1.value = -1
-		else:
-			motor0.value = d
-			motor1.value = d
+		motors[i].value = motorSum * 180	
 	
 	send = ("Recieved: " + str(d))
 	print(send)
