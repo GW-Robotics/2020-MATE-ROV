@@ -4,8 +4,8 @@ import pygame
 import os
 
 # host = "127.0.0.1"
-host = '192.168.137.92'
-port = 1234	
+host = '169.254.159.7'
+port = 1234
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print("CLient Socket Successfully created!")
