@@ -68,24 +68,30 @@ void changeThrottle(int throttle) {
   
 }
 
-void receiveString(int bytes) {
-  String text = "";
-  s = "";
-  while (Wire.available()) {
-    char c = Wire.read(); // receive a byte as character
-    s += c;
+void receiveData(int bytes) {
+  int motorVals[9];
+  int i = 0;
+  
+  for(i=0; i<9; i++){
+    motorVals[i]=-1;
   }
-  Serial.print("Printing: ");
-  Serial.println(s);
 
-  manageLed();
-}
+  Serial.print("[");
+  while(Wire.available()) {
+    int c = (int) Wire.read();
+    Serial.print(c, DEC);
+    Serial.print(", ");
+    motorVals[i] = c;
+    i++;
+  }
+  Serial.println("]");
 
-void manageLed() {
-  Serial.println(s);
-  int t = atoi(s.c_str());
-  Serial.println(t);
-  changeThrottle(t);
+  for(i=0; i<9; i++) {
+    Serial.print(motorVals[i]);
+    Serial.print(" ");
+  }
+
+  changeThrottle(motorVals[1]);
 }
 
 void setup() {
