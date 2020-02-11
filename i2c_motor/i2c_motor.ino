@@ -81,19 +81,6 @@ void receiveString(int bytes) {
   manageLed();
 }
 
-int StringToInt(){
-  int len = s.length();
-  char chars[len];
-  s.toCharArray(chars,len);
-  int ret = 0;
-  for (int i = 0; i < len; i++){
-    Serial.println(chars[i] + " " + i);
-    ret += (int(s[i]));
-    Serial.println(ret);
-  }
-  return ret;
-}
-
 void manageLed() {
   Serial.println(s);
   int t = atoi(s.c_str());
@@ -102,7 +89,7 @@ void manageLed() {
 }
 
 void setup() {
-    // Attach the the servo to the correct pin and set the pulse range
+  // Attach the the servo to the correct pin and set the pulse range
   esc0.attach(ESC_0, minPulseRate, maxPulseRate);
   esc1.attach(ESC_1, minPulseRate, maxPulseRate);
   esc2.attach(ESC_2, minPulseRate, maxPulseRate);
