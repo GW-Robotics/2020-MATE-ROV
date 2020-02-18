@@ -120,8 +120,8 @@ void setup() {
   // Start the I2C Bus as Slave on address 9
   Wire.begin(I2CAddress);
 
-   // Attach a function to trigger when something is received.
-  Wire.onReceive(receiveString);
+  // Attach a function to trigger when something is received.
+  Wire.onReceive(receiveData);
 }
 
 void loop() {
