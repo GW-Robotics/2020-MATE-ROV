@@ -3,12 +3,11 @@ import sys
 import pygame
 import os
 
-host = "127.0.0.1"
-port = 1234
+host = "fe80::d21a:f453:108b:8af6"
+port = 5005
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Client Socket Successfully created!")
-s.connect((host, port))
 
 pygame.init()
 screen = pygame.display.set_mode((400, 300))
@@ -73,8 +72,6 @@ while not done:
 
     bytearr = bytearray(d)
 
-    # data = pickle.dumps(d)
-    s.sendall(bytearr)
-    s.recv(1)
+    s.sendto(bytearr, (host, port))
 
 
