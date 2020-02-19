@@ -6,16 +6,20 @@ import os
 
 host = "fe80::d21a:f453:108b:8af6"
 port = 5005
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 print("Client Socket Successfully created!")
 
 ax0 = 0
+ax1 = 0
 ax3 = 0
 tl = 0
 tr = 0
 ax4 = 0
 bt4 = 0
 bt5 = 0
+
+done = False
+
 while not done:
 
     for event in get_gamepad():  # User did something.
@@ -44,7 +48,6 @@ while not done:
     d[1] = round(d[1])+100
     d[4] = round(d[4])+100
     d[5] = round(d[5])+100
-
 
     print(d)
 

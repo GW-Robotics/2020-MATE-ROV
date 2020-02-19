@@ -1,32 +1,16 @@
 import socket, pickle
 import time
-# import serial
-# from gpiozero import Servo
-# from smbus import SMBus
-# bus = SMBus(1)
+from gpiozero import Servo
+from smbus import SMBus
+bus = SMBus(1)
 addr = 9
-host = '127.0.0.1'
-port = 1234
-n_motors = 8
+host = "::"
+port = 5005
+n_motors = 1
 
-# motor1 = Servo(1,initial_value = None)
-# motor1.min()
-#motor2 = Servo(2,initial_value = -1)
-#motor3 = Servo(3,initial_value = -1)
-#motor4 = Servo(4,initial_value = -1)
-#motor5 = Servo(5,initial_value = -1)
-#motor6 = Servo(6,initial_value = -1)
-#motor7 = Servo(7,initial_value = -1)
-#motor8 = Servo(8,initial_value = -1)
-
-
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 s.bind((host,port))
 print("Server Socket was created and bound!")
-s.listen(5)
-
-conn, addr=s.accept()
-print("Conn: ",conn," Address: ",addr)
 
 #Manual controls -> Keyboard numbers
 #Up -> R trigger (A:5678)
@@ -52,21 +36,18 @@ ax4 = 4
 bt4 = 5
 bt5 = 6
 
-# motors = [motor1,motor2,motor3,motor4,motor5,motor6,motor7,motor8]
-# motors = [motor1]
-
 motorInputs = [
 	{	
 		"inputs": [ax0,ax1,ax4], 
-		"mults":[-1,-1,1]
+		"mults":[1,1,1]
 	},
 	{	
 		"inputs": [ax0,ax1,ax4], 
-		"mults":[1,-1,1]
+		"mults":[1,1,1]
 	},
 	{	
 		"inputs": [ax0,ax1], 
-		"mults":[-1,1]
+		"mults":[1,1]
 	},
 	{	
 		"inputs": [ax0,ax1], 
@@ -91,31 +72,25 @@ motorInputs = [
 ]
 
 while True:
-	d = list(conn.recv(8))
-	d = [(x-100)/100 for x in d]
+	data = s.recvfrom(1024)
+	d = data[0]
+	print(d)
 	motorSend = []
 	for i in range(n_motors):
 		motorSum = 0
 		activeInputs = 0
 		for j in range(0,len(motorInputs[i]["inputs"])):
 			currentInput = d[motorInputs[i]["inputs"][j]]
-			# print(currentInput, end=" ")
 			if abs(currentInput) > .05:
-				motorSum +=  currentInput * motorInputs[i]["mults"][j]
+				motorSum +=  currentInput * d[motorInputs[i]["mults"][j]]
 				activeInputs += 1
 		if (activeInputs != 0):
 			motorSum = motorSum / activeInputs
-			# print("Motor " + str(i+1) + ": " + str(motorSum))
+			print("Motor " + str(i+1) + ": " + str(motorSum))
 		motorSend.append(motorSum)
-		
-	final_send = []
-	for value in motorSend:
-		if value < 0:
-			final_send.append(0)
-		else:
-			final_send.append(value*180)
-	
-	print(final_send)
-	conn.sendall(bytes(1))
-	#bus.write_i2c_block_data(addr, 0x00, motorSend) # switch it on
-	# print()
+	if int(d[3]) > 180:
+		toSend = 90
+	else:
+		toSend = int(d[3]/2)
+	print(toSend)
+	bus.write_i2c_block_data(addr, 0x00, [toSend]*8) # switch it on
