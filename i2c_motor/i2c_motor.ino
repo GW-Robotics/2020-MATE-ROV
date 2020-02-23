@@ -19,7 +19,7 @@ Servo esc4;
 Servo esc5;
 Servo esc6;
 Servo esc7;
-String s = "";
+
 
 
 int minPulseRate = 1000;
@@ -29,8 +29,8 @@ int throttleChangeDelay = 100;
 int readThrottle() {
   int throttle = esc0.read();
   
-  Serial.print("Current throttle is: ");
-  Serial.println(throttle);
+  //Serial.print("Current throttle is: ");
+  //Serial.println(throttle);
   
   return throttle;
 }
@@ -67,31 +67,35 @@ void changeThrottle(int throttle) {
   }
   
 }
-
+int motorVals[9];
+bool readData = 1;
+String s = "";
+bool writeS = 0;
+void requestData(int bytes){
+  Serial.println("Data Write");
+  for(int i=0;i<5;i++){
+  Wire.write(1);
+  }
+}
 void receiveData(int bytes) {
-  int motorVals[9];
-  int i = 0;
+    int i = 0;
+    s = "[";
+    for(i=0; i<9; i++){
+      motorVals[i]=-1;
+    }
+    i=0;
+    while(Wire.available()) {
+      int c = (int) Wire.read();
+      s+=c;
+      s+=", ";
+      motorVals[i] = c;
+      i++;
+    }
+    s+="]";
+    writeS = 1;
   
-  for(i=0; i<9; i++){
-    motorVals[i]=-1;
-  }
-
-  Serial.print("[");
-  while(Wire.available()) {
-    int c = (int) Wire.read();
-    Serial.print(c, DEC);
-    Serial.print(", ");
-    motorVals[i] = c;
-    i++;
-  }
-  Serial.println("]");
-
-  for(i=0; i<9; i++) {
-    Serial.print(motorVals[i]);
-    Serial.print(" ");
-  }
-
-  changeThrottle(motorVals[1]);
+    changeThrottle(motorVals[1]);
+    Wire.flush();
 }
 
 void setup() {
@@ -122,9 +126,13 @@ void setup() {
 
   // Attach a function to trigger when something is received.
   Wire.onReceive(receiveData);
+  //Wire.onRequest(requestData);
 }
 
 void loop() {
-  delay(10);
+  if(writeS){
+    Serial.println(s);
+    writeS = 0;
+  }
   
 }
