@@ -1,7 +1,8 @@
 import socket, pickle
 import time
 from gpiozero import Servo
-from smbus import SMBus
+from smbus2 import SMBus
+from time import sleep
 bus = SMBus(1)
 addr = 9
 host = "::"
@@ -92,5 +93,9 @@ while True:
 		toSend = 90
 	else:
 		toSend = int(d[3]/2)
-	print(toSend)
-	bus.write_i2c_block_data(addr, 0x00, [toSend]*8) # switch it on
+	actually_send = [toSend]*6
+	actually_send.append(1)
+	actually_send.append(2)
+	print(actually_send)
+	bus.write_i2c_block_data(addr, 0x00, actually_send) # switch it on
+	sleep(.1)
