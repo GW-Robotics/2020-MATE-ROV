@@ -1,7 +1,8 @@
 import socket, pickle
 import time
 from gpiozero import Servo
-from smbus import SMBus
+from smbus2 import SMBus
+from time import sleep
 bus = SMBus(1)
 addr = 9
 host = "::"
@@ -15,8 +16,6 @@ print("Server Socket was created and bound!")
 #Manual controls -> Keyboard numbers
 #Up -> R trigger (A:5678)
 #Down -> L trigger (D:5678)
-#Roll right -> R bumper(A:56 D:78)
-#Roll left -> L bumper (A:78 D:56)
 #Lateral movement -> L stick
 	#Forward -> (A:12 D:34)
 	#Backward -> (A:34 D:12)
@@ -27,6 +26,13 @@ print("Server Socket was created and bound!")
 	#Down -> (A:57 D:68)
 	#Left -> (A:1 D:234)
 	#Right -> (A:2 D:134)
+
+# Arm left right: D-pad L/R
+# Arm up down: D-pad U/D
+#Arm spin clockwise -> R bumper(A:56 D:78)
+#Arm spin counterclockwise -> L bumper (A:78 D:56)
+# Open: A
+# Close: B
 
 ax0 = 0
 ax1 = 1
@@ -92,5 +98,10 @@ while True:
 		toSend = 90
 	else:
 		toSend = int(d[3]/2)
-	print(toSend)
-	bus.write_i2c_block_data(addr, 0x00, [toSend]*8) # switch it on
+	actually_send = [toSend]*6
+	actually_send.append(1)
+	actually_send.append(2)
+	print(actually_send)
+	bus.write_i2c_block_data(addr, 0x00, actually_send) # switch it on
+	
+	sleep(.1)
