@@ -1,8 +1,9 @@
 import socket, pickle
 import sys
-from inputs import KEYS_AND_BUTTONS as codes
 from inputs import get_gamepad
 import os
+from time import sleep
+
 
 host = "fe80::d21a:f453:108b:8af6"
 port = 5005
@@ -54,4 +55,4 @@ while not done:
     bytearr = bytearray(d)
     s.sendto(bytearr, (host, port))
 
-
+    sleep(.1)
