@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <Servo.h> 
+#include <LiquidCrystal.h>
 #define I2CAddress 9
 
 #define ESC_0 6
@@ -20,7 +21,7 @@ Servo esc5;
 Servo esc6;
 Servo esc7;
 
-
+LiquidCrystal lcd(12,11,5,4,3,2);
 
 int minPulseRate = 1000;
 int maxPulseRate = 2000;
@@ -59,8 +60,8 @@ void changeThrottle(int throttle) {
     esc2.write(currentThrottle + step);
     esc3.write(currentThrottle + step);
     esc4.write(currentThrottle + step);
-    esc5.write(currentThrottle + step);
-    esc6.write(currentThrottle + step);
+    //esc5.write(currentThrottle + step);
+    //esc6.write(currentThrottle + step);
     esc7.write(currentThrottle + step);
     currentThrottle = readThrottle();
     delay(throttleChangeDelay);
@@ -95,18 +96,20 @@ void receiveData(int bytes) {
     writeS = 1;
   
     changeThrottle(motorVals[1]);
-    Wire.flush();
+    //Wire.flush();
 }
 
 void setup() {
+  lcd.begin(16,2);
+  
   // Attach the the servo to the correct pin and set the pulse range
   esc0.attach(ESC_0, minPulseRate, maxPulseRate);
   esc1.attach(ESC_1, minPulseRate, maxPulseRate);
   esc2.attach(ESC_2, minPulseRate, maxPulseRate);
   esc3.attach(ESC_3, minPulseRate, maxPulseRate);
   esc4.attach(ESC_4, minPulseRate, maxPulseRate);
-  esc5.attach(ESC_5, minPulseRate, maxPulseRate);
-  esc6.attach(ESC_6, minPulseRate, maxPulseRate);
+  //esc5.attach(ESC_5, minPulseRate, maxPulseRate);
+  //esc6.attach(ESC_6, minPulseRate, maxPulseRate);
   esc7.attach(ESC_7, minPulseRate, maxPulseRate);
   
   // Write a minimum value (most ESCs require this correct startup)
@@ -115,11 +118,12 @@ void setup() {
   esc2.write(0);
   esc3.write(0);
   esc4.write(0);
-  esc5.write(0);
-  esc6.write(0);
+  //esc5.write(0);
+  //esc6.write(0);
   esc7.write(0);
   Serial.begin(9600);
-  Serial.println("Slave here");
+  lcd.setCursor(0,0);
+  lcd.print("Slave here");
  
   // Start the I2C Bus as Slave on address 9
   Wire.begin(I2CAddress);
@@ -131,7 +135,8 @@ void setup() {
 
 void loop() {
   if(writeS){
-    Serial.println(s);
+    lcd.setCursor(0,1);
+    lcd.print(s);
     writeS = 0;
   }
   
