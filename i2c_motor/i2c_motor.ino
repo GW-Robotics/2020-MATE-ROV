@@ -20,19 +20,15 @@ Servo esc4;
 Servo esc5;
 Servo esc6;
 Servo esc7;
-
-LiquidCrystal lcd(12,11,5,4,3,2);
+Servo escs[] = {esc0,esc1,esc2,esc3,esc4,esc5,esc6,esc7};
+int throttles[8];
 
 int minPulseRate = 1000;
 int maxPulseRate = 2000;
-int throttleChangeDelay = 100;
+int throttleChangeDelay = 50;
 
-int readThrottle() {
-  int throttle = esc0.read();
-  
-  //Serial.print("Current throttle is: ");
-  //Serial.println(throttle);
-  
+int readThrottle(int i) {
+  int throttle = escs[i].read();
   return throttle;
 }
 
@@ -43,35 +39,36 @@ int normalizeThrottle(int value) {
     return 180;
   return value;
 }
-
-void changeThrottle(int throttle) {
-  // Read the current throttle value
-  int currentThrottle = readThrottle();
-  
-  // Are we going up or down?
-  int step = 1;
-  if( throttle < currentThrottle )
-    step = -1;
-  
-  // Slowly move to the new throttle value 
-  while( currentThrottle != throttle ) {
-    esc0.write(currentThrottle + step);
-    esc1.write(currentThrottle + step);
-    esc2.write(currentThrottle + step);
-    esc3.write(currentThrottle + step);
-    esc4.write(currentThrottle + step);
-    //esc5.write(currentThrottle + step);
-    //esc6.write(currentThrottle + step);
-    esc7.write(currentThrottle + step);
-    currentThrottle = readThrottle();
-    delay(throttleChangeDelay);
+boolean checkThrottles(int throttles[]){
+  for(int i=0;i<8;i++){
+    if(throttles[i]!=readThrottle(i)){
+      return true;
+    }
   }
-  
+  return false;
 }
-int motorVals[9];
-bool readData = 1;
-String s = "";
-bool writeS = 0;
+void changeThrottle(int throttles[]) {
+  // Read the current throttle value
+  do{
+    for(int i=0;i<8;i++){
+      int throttle = throttles[i];
+      int currentThrottle = readThrottle(i);
+      
+      // Are we going up or down?
+      int step = 1;
+      if( throttle < currentThrottle )
+        step = -1;
+      
+      // Slowly move to the new throttle value 
+      if( currentThrottle != throttle ) {
+        escs[i].write(currentThrottle + step);
+        currentThrottle = readThrottle(i);
+      }
+  }
+  }while(checkThrottles(throttles));
+  
+
+}
 void requestData(int bytes){
   Serial.println("Data Write");
   for(int i=0;i<5;i++){
@@ -80,27 +77,22 @@ void requestData(int bytes){
 }
 void receiveData(int bytes) {
     int i = 0;
-    s = "[";
-    for(i=0; i<9; i++){
-      motorVals[i]=-1;
-    }
-    i=0;
+    int motorVals[8];
     while(Wire.available()) {
       int c = (int) Wire.read();
-      s+=c;
-      s+=", ";
-      motorVals[i] = c;
+      if(i!=0){
+        motorVals[i-1] = max(0,min(c,180)); 
+        //Serial.println(c);
+      }
       i++;
     }
-    s+="]";
-    writeS = 1;
-  
-    changeThrottle(motorVals[1]);
-    //Wire.flush();
+    for(int j=0;j<8;j++){
+      escs[j].write(motorVals[j]);
+    }
 }
 
 void setup() {
-  lcd.begin(16,2);
+
   
   // Attach the the servo to the correct pin and set the pulse range
   esc0.attach(ESC_0, minPulseRate, maxPulseRate);
@@ -108,8 +100,8 @@ void setup() {
   esc2.attach(ESC_2, minPulseRate, maxPulseRate);
   esc3.attach(ESC_3, minPulseRate, maxPulseRate);
   esc4.attach(ESC_4, minPulseRate, maxPulseRate);
-  //esc5.attach(ESC_5, minPulseRate, maxPulseRate);
-  //esc6.attach(ESC_6, minPulseRate, maxPulseRate);
+  esc5.attach(ESC_5, minPulseRate, maxPulseRate);
+  esc6.attach(ESC_6, minPulseRate, maxPulseRate);
   esc7.attach(ESC_7, minPulseRate, maxPulseRate);
   
   // Write a minimum value (most ESCs require this correct startup)
@@ -118,13 +110,9 @@ void setup() {
   esc2.write(0);
   esc3.write(0);
   esc4.write(0);
-  //esc5.write(0);
-  //esc6.write(0);
+  esc5.write(0);
+  esc6.write(0);
   esc7.write(0);
-  Serial.begin(9600);
-  lcd.setCursor(0,0);
-  lcd.print("Slave here");
- 
   // Start the I2C Bus as Slave on address 9
   Wire.begin(I2CAddress);
 
@@ -134,10 +122,21 @@ void setup() {
 }
 
 void loop() {
-  if(writeS){
-    lcd.setCursor(0,1);
-    lcd.print(s);
-    writeS = 0;
-  }
-  
+  /*
+  int throttle;
+  int currentThrottle;
+  for(int i=0;i<8;i++){
+    throttle = throttles[i];
+    currentThrottle = readThrottle(i);
+    // Are we going up or down?
+    int step = 1;
+    if( throttle < currentThrottle )
+      step = -1;
+    
+    // Slowly move to the new throttle value 
+    if( currentThrottle != throttle ) {
+      escs[i].write(currentThrottle + step);
+    }
+  }*/
+  delay(throttleChangeDelay);
 }
