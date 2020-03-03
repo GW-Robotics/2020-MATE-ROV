@@ -76,4 +76,4 @@ while not done:
     bytearr = bytearray(d)
     s.sendto(bytearr, (host, port))
 
-    sleep(0.2)
+    sleep(0.3)

@@ -93,7 +93,6 @@ while True:
 				activeInputs += 1
 		if (activeInputs != 0):
 			motorAvg = motorSum / activeInputs
-			#print("Motor " + str(i+1) + ": " + str(motorAvg)+" with active inputs:"+str(activeInputs)+" and sum: "+str(motorSum))
 		motorSend.append(int(max(motorAvg*180,0)))
 	
 	bus.write_i2c_block_data(addr, 0x00, motorSend) # switch it on
