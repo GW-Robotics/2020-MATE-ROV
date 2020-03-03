@@ -16,8 +16,12 @@ ax3 = 0
 tl = 0
 tr = 0
 ax4 = 0
-bt4 = 0
-bt5 = 0
+btnA = 0
+btnB = 0
+bl = 0
+br = 0
+dPadUD = 0
+dPadLR = 0
 
 done = False
 
@@ -26,33 +30,50 @@ while not done:
     for event in get_gamepad():  # User did something.
         code = event.code
         value = event.state
-        if(code == "ABS_X"):
-            ax0 = (value/32768)*100
-        elif(code == "ABS_Y"):
-            ax1 = (value/32768)*100
-        elif(code == "ABS_RX"):
-            ax3 = (value/32768)*100
-        elif(code == "ABS_RY"):
-            ax4 = (value/32768)*100
-        elif(code == "BTN_TL"):
-            bt4 = value
-        elif(code == "BTN_TR"):
-            bt5 = value
-        elif(code == "ABS_Z"):
+        if code == "ABS_X":
+            ax0 = (value / 32768) * 100
+        elif code == "ABS_Y":
+            ax1 = (value / 32768) * 100
+        elif code == "ABS_RX":
+            ax3 = (value / 32768) * 100
+        elif code == "ABS_RY":
+            ax4 = (value / 32768) * 100
+        elif code == "ABS_Z":
             tl = value
-        elif(code == "ABS_RZ"):
-            tr = value
+        elif code == "ABS_RZ":
+            tr = value / 255 * 100
+        elif code == "BTN_SOUTH":
+            btnA = value
+        elif code == "BTN_EAST":
+            btnB = value
+        elif code == "ABS_HAT0Y":
+            dPadUD = value
+        elif code == "ABS_HAT0X":
+            dPadLR = value
+        elif code == "BTN_TL":
+            bl = value
+        elif code == "BTN_TR":
+            br = value
+        elif code == "BTN_SELECT":
+            exit()
 
-    d = [ax0, ax1, tl,tr,ax3,ax4, bt4, bt5]
+    d = [
+        ax0,
+        ax1,
+        tr,
+        ax3,
+        ax4,
+        btnA * 100,
+        btnB * 100,
+        dPadUD * -100,
+        dPadLR * 100,
+        bl * 100,
+        br * 100
+    ]
 
-    d[0] = round(d[0])+100
-    d[1] = round(d[1])+100
-    d[4] = round(d[4])+100
-    d[5] = round(d[5])+100
-
-    print(d)
+    d = [round(x) + 100 for x in d]
 
     bytearr = bytearray(d)
     s.sendto(bytearr, (host, port))
 
-    sleep(.1)
+    sleep(0.2)
